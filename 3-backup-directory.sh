@@ -1,13 +1,30 @@
 #!/bin/bash
 
-# Prompt the user to enter a directory path
-read -p "Enter a directory path: " directory
+# Prompt the user to enter a directory name or path
+read -p "Enter a directory name or path: " directory
 
-# Check if the directory exists
+# Check if the specified directory exists
 if [ -d "$directory" ]; then
-    echo "Directory exists. Listing files and subdirectories:"
-    # List all files and subdirectories in the specified directory
-    ls -R "$directory"
+    # Get the current date and time
+    current_date=$(date +"%Y-%m-%d")
+    current_time=$(date +"%H-%M-%S")
+
+    # Create the backup directory name by appending the current date and time
+    backup_directory="${directory}_${current_date}_${current_time}"
+
+    # Create the backup directory
+    mkdir -p "$backup_directory"
+
+    # Copy the contents of the original directory to the backup directory
+    cp -r "$directory/"* "$backup_directory"
+
+    # Compress the backup directory using tar
+    tar -czf "${backup_directory}.tar.gz" "$backup_directory"
+
+    # Remove the uncompressed backup directory
+    rm -rf "$backup_directory"
+
+    echo "Backup directory '${backup_directory}.tar.gz' created and compressed successfully."
 else
-    echo "Error: Directory does not exist."
+    echo "Error: Directory '$directory' does not exist."
 fi
